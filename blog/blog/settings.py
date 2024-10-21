@@ -26,12 +26,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
 
+#Secret key (Make sure to generate a strong one for production)
+
+
 # Debug: True for development, False for production
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Allowed hosts: Can be dynamically set via the .env file
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
-
 
 # Application definition
 
@@ -82,8 +84,9 @@ WSGI_APPLICATION = 'blog.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 # Database: Use the DATABASE_URL variable for configuring the database
-DATABASES = {
-    'default': dj_database_url.parse(config('DATABASE_URL'))
+DATABASES = {'default': dj_database_url.parse(
+        config('DATABASE_URL', default='sqlite:///db.sqlite3')  # Default to SQLite if DATABASE_URL is not set
+    )
 }
 
 
@@ -121,6 +124,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # Security settings
 CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=True, cast=bool)
+#CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = False
 SECURE_SSL_REDIRECT = False
 
