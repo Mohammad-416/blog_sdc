@@ -1,6 +1,7 @@
 # Blog Application API
 
 This is a RESTful API for a blog application built with Django and Django REST Framework. It supports basic CRUD operations for blog posts and comments.
+This Project is live on https://sdcblogproject.onrender.com/api/blogs/
 
 ## Features
 
