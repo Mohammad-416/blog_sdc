@@ -1,44 +1,133 @@
-from rest_framework import status
+from django.http import JsonResponse
+from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth import get_user_model
+from rest_framework import status
+from blog_app.models import CustomUser
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
+import secrets
+import re
+import os
+from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.core.mail import send_mail
+from django.urls import reverse
 
-@api_view(['POST'])
-def register(request):
-    if request.method == 'POST':
+class RegisterView(APIView):
+    def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
         email = request.data.get('email')
 
-        if User.objects.filter(username=username).exists():
+        # Validate username and password
+        if not re.match(r'^[a-zA-Z0-9_-]{3,30}$', username):
+            return Response({'error': 'Invalid username'}, status=status.HTTP_400_BAD_REQUEST)
+        if not re.match(r'^(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$', password):
+            return Response({'error': 'Password must contain at least 8 characters, one digit, and one special character'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if CustomUser.objects.filter(username=username).exists():
             return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.create(
+        user = CustomUser.objects.create(
             username=username,
-            password=make_password(password),  # Hash the password
             email=email
         )
+        user.set_password(password)
         user.save()
-        return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+
+        
+
+        # Send activation email
+        
+        subject = 'Your account needs to be verified'
+        email_from = settings.EMAIL_HOST_USER
+        # Generate the activation link
+        activation_url = reverse('activate_account', kwargs={'email_token': user.author_id})
+        redirect_url = "http://127.0.0.1:8000/"
+        # Construct the complete URL (including the domain if needed)
+        complete_url = f'{redirect_url}{activation_url}'
+        message = f'Hi, click on this link to verify your account ' + complete_url
     
 
 
-@api_view(['POST'])
-def login(request):
-    if request.method == 'POST':
+        send_mail(subject, message, email_from, [email])
+        
+
+        return Response({'message': 'User created successfully. Please check your email for activation link.'}, status=status.HTTP_201_CREATED)
+
+class LoginView(APIView):
+    def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
 
-        if User.objects.filter(username=username).exists():
-            user = User.objects.get(username=username)
-            if user.check_password(password):
-                # Obtain tokens for the user
-                refresh = RefreshToken.for_user(user)
-                print("Access Token:", str(refresh.access_token))
-                print("Refresh Token:", str(refresh))
-                return Response({'Access Token' : str(refresh.access_token) , 'Refresh Token' : str(refresh)}, status=status.HTTP_200_OK)
+        try:
+            user = CustomUser.objects.get(username=username)
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not user.is_active:
+            return Response({'error': 'Account is not activated. Please check your email for activation link.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not user.check_password(password):
+            return Response({'error': 'Incorrect password'}, status=status.HTTP_400_BAD_REQUEST)
+
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'author_id': str(user.author_id)
+        }, status=status.HTTP_200_OK)
+
+class ActivateAccountView(APIView):
+    def get(self, request, email_token):
+        try:
+            user = CustomUser.objects.get(author_id=email_token)
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'Invalid activation link'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not user.is_active:
+            user.is_active = True
+            user.save()
+            return Response({'message': 'Account activated successfully'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'message': 'Your account is already active'}, status=status.HTTP_200_OK)
+
+class CreateSuperUserView(APIView):
+    def post(self, request):
+        secret_key = settings.SUPERUSER_SECRET_KEY
+        provided_secret = request.data.get('secret')
+
+        if secret_key != provided_secret:
+            return Response({'error': 'Invalid secret key'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        try:
+            CustomUser.objects.create_superuser(username, email, password)
+            return Response({'message': 'Superuser created successfully'}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+def refresh_token(request, token):
+    refresh_token = token
+    
+    try:
+        token = RefreshToken(refresh_token)
+        access_token = str(token.access_token)
+        
+        # Set the new access token in the response
+        response = {
+            'access': access_token,
+            'refresh': str(token)
+        }
+        
+        return JsonResponse(response)
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
