@@ -39,24 +39,9 @@ class RegisterView(APIView):
         user.save()
 
         
-
-        # Send activation email
-        
-        subject = 'Your account needs to be verified'
-        email_from = settings.EMAIL_HOST_USER
-        # Generate the activation link
-        activation_url = reverse('activate_account', kwargs={'email_token': user.author_id})
-        redirect_url = "http://127.0.0.1:8000/"
-        # Construct the complete URL (including the domain if needed)
-        complete_url = f'{redirect_url}{activation_url}'
-        message = f'Hi, click on this link to verify your account ' + complete_url
-    
-
-
-        send_mail(subject, message, email_from, [email])
         
 
-        return Response({'message': 'User created successfully. Please check your email for activation link.'}, status=status.HTTP_201_CREATED)
+        return Response({'message': 'User created successfully.'}, status=status.HTTP_201_CREATED)
 
 class LoginView(APIView):
     def post(self, request):
@@ -67,9 +52,6 @@ class LoginView(APIView):
             user = CustomUser.objects.get(username=username)
         except CustomUser.DoesNotExist:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
-
-        if not user.is_active:
-            return Response({'error': 'Account is not activated. Please check your email for activation link.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if not user.check_password(password):
             return Response({'error': 'Incorrect password'}, status=status.HTTP_400_BAD_REQUEST)
