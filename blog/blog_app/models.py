@@ -15,6 +15,8 @@ class Blog(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     likes = models.IntegerField(default=0)
 
+    
+
 class Comment(models.Model):
     blog = models.ForeignKey('Blog', related_name='comments', on_delete=models.CASCADE)
     comment_text = models.TextField()
@@ -51,7 +53,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True)
     email = models.EmailField(unique=True)
     author_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     
     USERNAME_FIELD = 'username'

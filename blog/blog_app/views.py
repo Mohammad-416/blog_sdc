@@ -16,6 +16,26 @@ class BlogDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BlogSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
+    def update(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        author_id = request.data.get('author_id')
+        if author_id and author_id == str(blog.author_id):
+            serializer = self.serializer_class(data=request.data, instance=blog)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+        return Response({'error': 'You are not the author of this post'}, status=403)
+
+    def destroy(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        author_id = request.data.get('author_id')
+        if author_id and author_id == str(blog.author_id):
+            blog.delete()
+            return Response(status=204)
+        return Response({'error': 'You are not the author of this post'}, status=403) 
+    
+    
+
 @api_view(['POST'])
 def add_comment(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
