@@ -12,5 +12,6 @@ tzdata==2024.2
 psycopg2==2.9.10
 cloudinary
 django-cors-headers==4.5.0
+psycopg2
 yagmail
 django-cloudinary-storage

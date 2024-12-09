@@ -15,6 +15,12 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
 
 - **POST /register/**
   - Register a new user.
+  - **Headers:**
+    ```json
+    {
+      "content-type" : "application/json"
+    }
+    ```
   - **Request Body:**
     ```json
     {
@@ -24,8 +30,14 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
     }
     ```
 
-- **POST /api/token/**
-  - Obtain a JWT token by providing username and password.
+- **POST /login/**
+  - Obtain a Json web token by providing username and password.
+  - **Headers:**
+    ```json
+    {
+      "content-type" : "application/json"
+    }
+    ```
   - **Request Body:**
     ```json
     {
@@ -37,18 +49,31 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
     ```json
     {
       "access": "your_access_token",
+      "refresh": "your_refresh_token",
+      "author_id": "your_author_id"
+    }
+    ```
+    
+- **GET /refresh_token/<your-refresh-token>**
+  - Obtain a new access token by providing the refresh token.
+  
+  - **Response:**
+    ```json
+    {
+      "access": "your_access_token",
       "refresh": "your_refresh_token"
     }
     ```
+
+
 
 ### Blog Posts
 
 - **POST /api/blogs/**
   - Create a new blog post.
   - **Headers:**
-    ```
+    ```json
     {
-      "content-type" : "application/json",
       "authorization" : "Bearer your_jwt_access_token"
     }
     ```
@@ -57,46 +82,58 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
     {
       "title": "Your Blog Title",
       "content": "Your blog content here.",
-      "author": your_author_id
+      "author": "your_author_id"
+    }
+    ``'
+  - **Files:**
+    ```json
+    {
+      "images" : "<your-image-file>"
     }
     ```
 
 - **GET /api/blogs/**
   - Retrieve a list of all blog posts.
 
-- **GET /api/blogs/{id}/**
+- **GET /api/blogs/{blog_id}/**
   - Retrieve a specific blog post by its ID.
 
-- **PUT /api/blogs/{id}/**
+- **PUT /api/blogs/{blog_id}/**
   - Update an existing blog post by its ID.
   - **Request Body:**
     ```json
     {
       "title": "Updated Blog Title",
       "content": "Updated blog content.",
-      "author": your_author_id
+      "author": "your_author_id"
     }
     ```
 
-- **DELETE /api/blogs/{id}/**
+- **DELETE /api/blogs/{blog_id}/**
   - Delete a blog post by its ID.
+  - **Request Body:**
+    ```json
+    {
+      "author": "your_author_id"
+    }
+    ```
 
 ### Comments
 
-- **POST /api/blogs/{id}/comments/**
+- **POST /api/blogs/{blog_id}/comments/**
   - Add a comment to a blog post.
   - **Request Body:**
     ```json
     {
-      "blog" : blog_id,
+      "blog" : "blog_id",
       "comment_text": "This is a comment.",
-      "author" : your_author_id
+      "author" : "your_author_id"
     }
     ```
 
 ### Like
 
-- **POST /api/blogs/{id}/like/**
+- **PUT /api/blogs/{blog_id}/like/**
   - Add a like to a blog post.
   
 
@@ -108,8 +145,13 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
      DATABASE_URL=your_database_url
      SECRET_KEY=your_secret_key
      DEBUG=True
-     ALLOWED_HOSTS=*
-     CSRF_COOKIE_SECURE=True
+     ALLOWED_HOSTS=allowed-hosts
+     SUPERUSER_SECRET_KEY = secret-key-to-create-super-user
+     //Create an account on cloudinary and get this info
+     CLOUDINARY_URL = your_cloudinary_url
+     CLOUDINARY_CLOUD_NAME = your_cloudinary_cloud_name
+     CLOUDINARY_API_KEY = your_cloudinary_api_key
+     CLOUDINARY_API_SECRET = your_cloudinary_api_secret
      ```
 
 2. **Install Dependencies**
@@ -121,6 +163,8 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
 3. **Migrate Database**
    - Run the migrations to set up the database:
      ```bash
+     python manage.py makemigrations
+     python manage.py makemigrations blog_app
      python manage.py migrate
      ```
 
