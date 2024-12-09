@@ -10,6 +10,6 @@ python-dotenv
 typing_extensions==4.12.2
 tzdata==2024.2
 psycopg2==2.9.10
-clouinary
+cloudinary
 django-cors-headers==4.5.0
 yagmail
