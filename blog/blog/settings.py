@@ -40,8 +40,11 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='localhost').split(',')
 print(ALLOWED_HOSTS)
 # Application definition
+CSRF_TRUSTED_ORIGINS = [
+    'https://sdcblogproject.onrender.com',  # Your hosted app
+    'http://localhost',  # Local testing (optional)
+]
 
-CSRF_TRUSTED_ORIGINS = ['*']
 CORS_ALLOW_ALL_ORIGINS = True
 
 
