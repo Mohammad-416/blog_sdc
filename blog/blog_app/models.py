@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils.translation import gettext_lazy as _
 import uuid
 from django.conf import settings
-
+from cloudinary.models import CloudinaryField
 
 class Blog(models.Model):
     title = models.CharField(max_length=200)
@@ -14,6 +14,18 @@ class Blog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     likes = models.IntegerField(default=0)
+    images = models.ManyToManyField('Image', related_name='blog_images')
+    
+    def __str__(self):
+        return self.title
+
+
+class Image(models.Model):
+    image = CloudinaryField('image')
+    blog = models.ForeignKey('Blog', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.image
 
     
 
