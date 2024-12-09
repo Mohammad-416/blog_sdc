@@ -84,7 +84,7 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
       "content": "Your blog content here.",
       "author": "your_author_id"
     }
-    ``'
+    ```
   - **Files:**
     ```json
     {
