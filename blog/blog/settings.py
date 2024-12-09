@@ -166,13 +166,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 
 # Security settings
-CSRF_COOKIE_SECURE = False
-CSRF_COOKIE_HTTPONLY = False
-CSRF_PROTECTION = False
-#CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = False
-SECURE_SSL_REDIRECT = False
-
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+CORS_ORIGIN_WHITELIST = ['https://sdcblogproject.onrender.com']
 # Other security settings
 X_FRAME_OPTIONS = 'DENY'
 SECURE_BROWSER_XSS_FILTER = True
