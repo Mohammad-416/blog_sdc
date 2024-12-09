@@ -24,8 +24,9 @@ class Image(models.Model):
     image = CloudinaryField('image')
     blog = models.ForeignKey('Blog', on_delete=models.CASCADE)
 
+    
     def __str__(self):
-        return self.image
+        return str(self.image.url)  
 
     
 
