@@ -82,7 +82,7 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
     {
       "title": "Your Blog Title",
       "content": "Your blog content here.",
-      "author": "your_author_id"
+      "author_id": "your_author_id"
     }
     ```
   - **Files:**
@@ -105,7 +105,7 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
     {
       "title": "Updated Blog Title",
       "content": "Updated blog content.",
-      "author": "your_author_id"
+      "author_id": "your_author_id"
     }
     ```
 
@@ -114,7 +114,7 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
   - **Request Body:**
     ```json
     {
-      "author": "your_author_id"
+      "author_id": "your_author_id"
     }
     ```
 
@@ -127,7 +127,7 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
     {
       "blog" : "blog_id",
       "comment_text": "This is a comment.",
-      "author" : "your_author_id"
+      "author_id" : "your_author_id"
     }
     ```
 
