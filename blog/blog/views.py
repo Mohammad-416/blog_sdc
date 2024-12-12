@@ -97,7 +97,7 @@ class CreateSuperUserView(APIView):
 
 def get_username(request, author_id):
     user = CustomUser.objects.get(author_id=author_id)
-    return JsonRespnse('username : ': user.username)
+    return JsonRespnse({'username : ': user.username})
     
 def refresh_token(request, token):
     refresh_token = token
