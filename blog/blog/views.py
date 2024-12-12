@@ -95,7 +95,10 @@ class CreateSuperUserView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-
+def get_username(request, author_id):
+    user = CustomUser.objects.get(author_id=author_id)
+    return JsonRespnse('username : ' user.username)
+    
 def refresh_token(request, token):
     refresh_token = token
     
