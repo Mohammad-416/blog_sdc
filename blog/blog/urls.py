@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import RegisterView, LoginView, ActivateAccountView, CreateSuperUserView, refresh_token
+from .views import RegisterView, LoginView, ActivateAccountView, CreateSuperUserView, refresh_token, get_username
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +26,5 @@ urlpatterns = [
     path('activate/<str:email_token>/', ActivateAccountView.as_view(), name='activate_account'),
     path('create-superuser/', CreateSuperUserView.as_view(), name='create_superuser'),
     path('refresh_token/<token>/', refresh_token, name='refresh_token'),
+    path('get_username/<author_id>', get_username , name='get_username'),
 ]
