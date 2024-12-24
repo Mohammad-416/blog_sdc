@@ -19,8 +19,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 class BlogSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True, read_only=True)
-    comment = CommentSerializer(many=True, read_only=True)
+    comments = CommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Blog
-        fields = ['id', 'title', 'content', 'author_id', 'created_at', 'updated_at', 'likes', 'images', 'comment']
+        fields = ['id', 'title', 'content', 'author_id', 'created_at', 'updated_at', 'likes', 'images', 'comments']

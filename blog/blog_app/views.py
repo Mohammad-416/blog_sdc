@@ -8,8 +8,8 @@ from django.shortcuts import get_object_or_404
 from cloudinary.uploader import upload
 from django.conf import settings
 from blog_app.models import CustomUser, Like
-
-
+from rest_framework import status
+from rest_framework.views import APIView
 
 class BlogListCreateView(generics.ListCreateAPIView):
     queryset = Blog.objects.all()
@@ -114,29 +114,42 @@ def add_comment(request, pk):
         return Response(serializer.data)
     return Response(serializer.errors, status=400)
 
-@api_view(['PUT'])
-def like_post(request, pk):
-    blog = get_object_or_404(Blog, pk=pk)
-    author_id = request.data.get('author_id')
-    user = CustomUser.objects.get(author_id=author_id)
-    liked_by = Like.objects.filter(blog = blog)
-    if(liked_by.filter(user = user)):
-        is_liked = liked_by.get(user = user).is_liked
-        if is_liked:
-            blog.likes -= 1
-            liked_by.get(user = user).is_liked = False
-            liked_by.get(user = user).save()
-            blog.save()
+
+class LikePostView(APIView):
+    @api_view(['PUT'])
+    def like_post(self, request, pk):
+        blog = get_object_or_404(Blog, pk=pk)
+        
+        # Validate author_id exists in request data
+        if 'author_id' not in request.data:
+            return Response({"error": "Author ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            author = CustomUser.objects.get(author_id=request.data['author_id'])
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Invalid author ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if user is authenticated
+        if not request.user.is_authenticated:
+            return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Check if user has already liked the post
+        existing_like = Like.objects.filter(blog=blog, user=author).first()
+        if existing_like:
+            if existing_like.is_liked:
+                blog.likes -= 1
+                existing_like.is_liked = False
+            else:
+                blog.likes += 1
+                existing_like.is_liked = True
         else:
+            Like.objects.create(
+                blog=blog,
+                user=author,
+                is_liked=True
+            )
             blog.likes += 1
-            liked_by.get(user = user).is_liked = True
-            liked_by.get(user = user).save()
-            blog.save()
-    else:
-        like = Like.objects.create(blog = blog, user = user, is_liked = True)
-        like.save()
-        blog.likes += 1
+
         blog.save()
-    return Response({"likes": blog.likes})
 
-
+        return Response({"likes": blog.likes})
