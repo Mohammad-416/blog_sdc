@@ -115,37 +115,36 @@ def add_comment(request, pk):
     return Response(serializer.errors, status=400)
 
 
-class LikePostView(APIView):
-    @api_view(['PUT'])
-    def like_post(self, request, pk):
-        blog = get_object_or_404(Blog, pk=pk)
+@api_view(['PUT'])
+def like_post(request, pk):
+    blog = get_object_or_404(Blog, pk=pk)
         
-        # Validate author_id exists in request data
-        if 'author_id' not in request.data:
-            return Response({"error": "Author ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+    # Validate author_id exists in request data
+    if 'author_id' not in request.data:
+        return Response({"error": "Author ID is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            author = CustomUser.objects.get(author_id=request.data['author_id'])
-        except CustomUser.DoesNotExist:
-            return Response({"error": "Invalid author ID"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        author = CustomUser.objects.get(author_id=request.data['author_id'])
+    except CustomUser.DoesNotExist:
+        return Response({"error": "Invalid author ID"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if user has already liked the post
-        existing_like = Like.objects.filter(blog=blog, user=author).first()
-        if existing_like:
-            if existing_like.is_liked:
-                blog.likes -= 1
-                existing_like.is_liked = False
-            else:
-                blog.likes += 1
-                existing_like.is_liked = True
+    # Check if user has already liked the post
+    existing_like = Like.objects.filter(blog=blog, user=author).first()
+    if existing_like:
+        if existing_like.is_liked:
+            blog.likes -= 1
+            existing_like.is_liked = False
         else:
-            Like.objects.create(
-                blog=blog,
-                user=author,
-                is_liked=True
-            )
             blog.likes += 1
+            existing_like.is_liked = True
+    else:
+        Like.objects.create(
+            blog=blog,
+            user=author,
+            is_liked=True
+        )
+        blog.likes += 1
 
-        blog.save()
+    blog.save()
 
-        return Response({"likes": blog.likes})
+    return Response({"likes": blog.likes})
