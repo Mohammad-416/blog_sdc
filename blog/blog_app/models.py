@@ -13,7 +13,7 @@ class Blog(models.Model):
     author_id = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    likes_count = models.IntegerField(default=0)
+    likes = models.IntegerField(default=0)
     images = models.ManyToManyField('Image', related_name='blog_images')
     
     def __str__(self):
@@ -37,8 +37,8 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Like(models.Model):
-    blog = models.ForeignKey('Blog', related_name='likes', on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='likes', on_delete=models.CASCADE)
+    blog = models.ForeignKey('Blog', related_name='like', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='like', on_delete=models.CASCADE)
     is_liked = models.BooleanField(blank=True, default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

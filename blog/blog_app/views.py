@@ -122,20 +122,20 @@ def like_post(request, pk, author_id):
     if(liked_by.filter(user = user)):
         is_liked = liked_by.get(user = user).is_liked
         if is_liked:
-            blog.likes_count -= 1
+            blog.likes -= 1
             liked_by.get(user = user).is_liked = False
             liked_by.get(user = user).save()
             blog.save()
         else:
-            blog.likes_count += 1
+            blog.likes += 1
             liked_by.get(user = user).is_liked = True
             liked_by.get(user = user).save()
             blog.save()
     else:
         like = Like.objects.create(blog = blog, user = user, is_liked = True)
         like.save()
-        blog.likes_count += 1
+        blog.likes += 1
         blog.save()
-    return Response({"likes": blog.likes_count})
+    return Response({"likes": blog.likes})
 
 
