@@ -115,8 +115,9 @@ def add_comment(request, pk):
     return Response(serializer.errors, status=400)
 
 @api_view(['PUT'])
-def like_post(request, pk, author_id):
+def like_post(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
+    author_id = request.data.get('author_id')
     user = CustomUser.objects.get(author_id=author_id)
     liked_by = Like.objects.filter(blog = blog)
     if(liked_by.filter(user = user)):
