@@ -13,7 +13,7 @@ class Blog(models.Model):
     author_id = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    likes = models.IntegerField(default=0)
+    likes_count = models.IntegerField(default=0)
     images = models.ManyToManyField('Image', related_name='blog_images')
     
     def __str__(self):
