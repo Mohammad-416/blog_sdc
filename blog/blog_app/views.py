@@ -129,10 +129,6 @@ class LikePostView(APIView):
         except CustomUser.DoesNotExist:
             return Response({"error": "Invalid author ID"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if user is authenticated
-        if not request.user.is_authenticated:
-            return Response({"error": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
-
         # Check if user has already liked the post
         existing_like = Like.objects.filter(blog=blog, user=author).first()
         if existing_like:
