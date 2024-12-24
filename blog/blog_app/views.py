@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from cloudinary.uploader import upload
 from django.conf import settings
-
+from blog_app.models import CustomUser, Like
 
 
 
@@ -115,10 +115,27 @@ def add_comment(request, pk):
     return Response(serializer.errors, status=400)
 
 @api_view(['PUT'])
-def like_post(request, pk):
+def like_post(request, pk, author_id):
     blog = get_object_or_404(Blog, pk=pk)
-    blog.likes += 1
-    blog.save()
+    user = CustomUser.objects.get(author_id=author_id)
+    liked_by = Like.objects.filter(blog = blog)
+    if(liked_by.filter(user = user)):
+        is_liked = liked_by.get(user = user).is_liked
+        if is_liked:
+            blog.likes -= 1
+            liked_by.get(user = user).is_liked = False
+            liked_by.get(user = user).save()
+            blog.save()
+        else:
+            blog.likes += 1
+            liked_by.get(user = user).is_liked = True
+            liked_by.get(user = user).save()
+            blog.save()
+    else:
+        like = Like.objects.create(blog = blog, user = user, is_liked = True)
+        like.save()
+        blog.likes += 1
+        blog.save()
     return Response({"likes": blog.likes})
 
 

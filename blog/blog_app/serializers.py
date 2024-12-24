@@ -9,16 +9,18 @@ class ImageSerializer(serializers.ModelSerializer):
         model = Image
         fields = ['id', 'image']
 
-class BlogSerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Blog
-        fields = ['id', 'title', 'content', 'author_id', 'created_at', 'updated_at', 'likes', 'images']
-
 
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ['id', 'blog', 'comment_text', 'author_id', 'created_at']
+
+
+class BlogSerializer(serializers.ModelSerializer):
+    images = ImageSerializer(many=True, read_only=True)
+    comment = CommentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Blog
+        fields = ['id', 'title', 'content', 'author_id', 'created_at', 'updated_at', 'likes', 'images', 'comment']

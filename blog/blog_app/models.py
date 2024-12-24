@@ -36,6 +36,12 @@ class Comment(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='comments', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+class Like(models.Model):
+    blog = models.ForeignKey('Blog', related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='likes', on_delete=models.CASCADE)
+    is_liked = models.BooleanField(blank=True, default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
 class UserManager(BaseUserManager):
     def create_user(self, username, email, password):
         if username is None:
