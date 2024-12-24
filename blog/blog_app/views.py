@@ -1,13 +1,13 @@
 # blog_app/views.py
 from rest_framework import generics, permissions
-from .models import Blog, Comment, Image
+from .models import Blog, Comment, Image, Like
 from .serializers import BlogSerializer, CommentSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from cloudinary.uploader import upload
 from django.conf import settings
-from blog_app.models import CustomUser, Like
+from blog_app.models import CustomUser
 from rest_framework import status
 from rest_framework.views import APIView
 
