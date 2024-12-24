@@ -135,6 +135,12 @@ This Project is live on https://sdcblogproject.onrender.com/api/blogs/
 
 - **PUT /api/blogs/{blog_id}/like/**
   - Add a like to a blog post.
+  - **Request Body:**
+    ```json
+    {
+      "author_id" : "your_author_id"
+    }
+    ```
   
 
 ## Usage
