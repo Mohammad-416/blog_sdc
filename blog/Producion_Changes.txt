@@ -1,7 +1,0 @@
-to be removed in production 
-
-EMAIL_HOST_USER
-CSRF_COOKIE
-DEBUG
-
-line 49 in blog/views.py
