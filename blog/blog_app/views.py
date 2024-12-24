@@ -131,12 +131,15 @@ def like_post(request, pk):
     # Check if user has already liked the post
     existing_like = Like.objects.filter(blog=blog, user=author).first()
     if existing_like:
-        if existing_like.is_liked:
-            blog.likes -= 1
-            existing_like.is_liked = False
+        if (existing_like.is_liked == True):
+            if(blog.likes > 0):
+                blog.likes -= 1
+                existing_like.is_liked = False
+                existing_like.save()
         else:
             blog.likes += 1
             existing_like.is_liked = True
+            existing_like.save()
     else:
         Like.objects.create(
             blog=blog,
